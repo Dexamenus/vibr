@@ -1,17 +1,35 @@
-# vibr
+# SociAI
 
-A new Flutter project.
+Flutter prototype for the SociAI mobile designs. The app includes sign in and
+sign up, brand setup, a home dashboard, a monthly/weekly content calendar, an
+AI creation flow, post editing and details, comment classification, insights,
+and settings.
 
-## Getting Started
+## Run
 
-This project is a starting point for a Flutter application.
+```bash
+flutter pub get
+flutter run
+```
 
-A few resources to get you started if this is your first Flutter project:
+Run the widget tests and static analysis with:
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
+```bash
+flutter test
+flutter analyze
+```
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Project structure
+
+- `lib/core/` — app theme, content models, and in-memory demo state.
+- `lib/features/` — authentication, onboarding, dashboard, scheduling,
+  creation, comments, insights, settings, and post details.
+- `lib/shared/widgets/` — reusable buttons, cards, form controls, status
+  indicators, navigation, and generated artwork.
+
+## Demo behavior
+
+Content and preferences are stored in memory and reset when the app restarts.
+The artwork is a local visual preview; AI generation, authentication, social
+account linking, uploads, comment replies, analytics, and publishing are not
+connected to external services.
