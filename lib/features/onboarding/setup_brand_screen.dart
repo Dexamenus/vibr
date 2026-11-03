@@ -2,7 +2,12 @@ import 'package:flutter/material.dart';
 
 import '../../core/state/app_controller.dart';
 import '../../core/theme/app_theme.dart';
-import '../../shared/widgets/app_widgets.dart';
+import '../../shared/widgets/app_page.dart';
+import '../../shared/widgets/app_text_field.dart';
+import '../../shared/widgets/brand_logo.dart';
+import '../../shared/widgets/primary_button.dart';
+import '../../shared/widgets/selectable_pill.dart';
+import '../../shared/widgets/show_demo_message.dart';
 import '../shell/home_shell.dart';
 
 class SetupBrandScreen extends StatefulWidget {

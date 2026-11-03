@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../core/models/app_models.dart';
 import '../../core/state/app_controller.dart';
-import '../../shared/widgets/app_widgets.dart';
+import '../../shared/widgets/app_bottom_navigation.dart';
 import '../auth/auth_screens.dart';
 import '../create/create_hub_screen.dart';
 import '../create/prompt_input_screen.dart';

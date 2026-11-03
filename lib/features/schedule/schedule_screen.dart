@@ -3,7 +3,16 @@ import 'package:flutter/material.dart';
 import '../../core/models/app_models.dart';
 import '../../core/state/app_controller.dart';
 import '../../core/theme/app_theme.dart';
-import '../../shared/widgets/app_widgets.dart';
+import '../../shared/widgets/app_icon_button.dart';
+import '../../shared/widgets/app_page.dart';
+import '../../shared/widgets/empty_state.dart';
+import '../../shared/widgets/generated_artwork.dart';
+import '../../shared/widgets/primary_button.dart';
+import '../../shared/widgets/screen_header.dart';
+import '../../shared/widgets/section_heading.dart';
+import '../../shared/widgets/social_platform_icon.dart';
+import '../../shared/widgets/status_pill.dart';
+import '../../shared/widgets/surface_card.dart';
 
 class ScheduleScreen extends StatefulWidget {
   const ScheduleScreen({

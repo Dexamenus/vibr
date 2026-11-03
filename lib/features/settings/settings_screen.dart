@@ -2,7 +2,12 @@ import 'package:flutter/material.dart';
 
 import '../../core/state/app_controller.dart';
 import '../../core/theme/app_theme.dart';
-import '../../shared/widgets/app_widgets.dart';
+import '../../shared/widgets/app_page.dart';
+import '../../shared/widgets/screen_header.dart';
+import '../../shared/widgets/secondary_button.dart';
+import '../../shared/widgets/section_heading.dart';
+import '../../shared/widgets/show_demo_message.dart';
+import '../../shared/widgets/surface_card.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({

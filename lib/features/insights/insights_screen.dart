@@ -2,7 +2,13 @@ import 'package:flutter/material.dart';
 
 import '../../core/state/app_controller.dart';
 import '../../core/theme/app_theme.dart';
-import '../../shared/widgets/app_widgets.dart';
+import '../../shared/widgets/app_page.dart';
+import '../../shared/widgets/generated_artwork.dart';
+import '../../shared/widgets/metric_card.dart';
+import '../../shared/widgets/screen_header.dart';
+import '../../shared/widgets/section_heading.dart';
+import '../../shared/widgets/social_platform_icon.dart';
+import '../../shared/widgets/surface_card.dart';
 import '../comments/comments_screen.dart';
 
 class InsightsScreen extends StatefulWidget {

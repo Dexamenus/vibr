@@ -3,7 +3,15 @@ import 'package:flutter/material.dart';
 import '../../core/models/app_models.dart';
 import '../../core/state/app_controller.dart';
 import '../../core/theme/app_theme.dart';
-import '../../shared/widgets/app_widgets.dart';
+import '../../shared/widgets/app_icon_button.dart';
+import '../../shared/widgets/app_page.dart';
+import '../../shared/widgets/generated_artwork.dart';
+import '../../shared/widgets/primary_button.dart';
+import '../../shared/widgets/screen_header.dart';
+import '../../shared/widgets/secondary_button.dart';
+import '../../shared/widgets/selectable_pill.dart';
+import '../../shared/widgets/show_demo_message.dart';
+import '../../shared/widgets/social_platform_icon.dart';
 
 class GeneratedResultScreen extends StatefulWidget {
   const GeneratedResultScreen({
