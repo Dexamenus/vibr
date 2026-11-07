@@ -1,25 +1,24 @@
 import 'package:flutter/material.dart';
 
-import '../../core/models/app_models.dart';
-
 class StatusPill extends StatelessWidget {
-  const StatusPill({super.key, required this.status});
+  const StatusPill({super.key, required this.label, required this.color});
 
-  final PostStatus status;
+  final String label;
+  final Color color;
 
   @override
   Widget build(BuildContext context) {
     return DecoratedBox(
       decoration: BoxDecoration(
-        color: status.color.withValues(alpha: 0.12),
+        color: color.withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(30),
       ),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
         child: Text(
-          status.label,
+          label,
           style: TextStyle(
-            color: status.color,
+            color: color,
             fontSize: 11,
             fontWeight: FontWeight.w600,
           ),

@@ -1,294 +1,317 @@
 import 'package:flutter/material.dart';
 
-import '../../core/models/app_models.dart';
-import '../../core/state/app_controller.dart';
 import '../../core/theme/app_theme.dart';
-import '../../shared/widgets/app_page.dart';
-import '../../shared/widgets/empty_state.dart';
-import '../../shared/widgets/generated_artwork.dart';
+import '../../shared/widgets/app_bottom_navigation.dart';
 import '../../shared/widgets/metric_card.dart';
-import '../../shared/widgets/primary_button.dart';
 import '../../shared/widgets/section_heading.dart';
-import '../../shared/widgets/social_platform_icon.dart';
 import '../../shared/widgets/status_pill.dart';
 import '../../shared/widgets/surface_card.dart';
+import '../../shared/widgets/top_toast.dart';
+import '../canva/canva_connection.dart';
+import '../canva/canva_flow.dart';
+import '../create/create_with_ai_screen.dart';
 
-class HomeScreen extends StatelessWidget {
-  const HomeScreen({
-    super.key,
-    required this.controller,
-    required this.onOpenSchedule,
-    required this.onOpenCreate,
-    required this.onOpenComments,
-    required this.onOpenInsights,
-    required this.onOpenProfile,
-    required this.onOpenPost,
-  });
+// HomeScreen = halaman Beranda. Pakai StatefulWidget karena menyimpan objek yang
+// hidup selama halaman ada (CanvaConnection) dan perlu dibuang di dispose().
+class HomeScreen extends StatefulWidget {
+  const HomeScreen({super.key});
 
-  final AppController controller;
-  final VoidCallback onOpenSchedule;
-  final VoidCallback onOpenCreate;
-  final VoidCallback onOpenComments;
-  final VoidCallback onOpenInsights;
-  final VoidCallback onOpenProfile;
-  final ValueChanged<SocialPost> onOpenPost;
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
 
+class _HomeScreenState extends State<HomeScreen> {
+  // const: nilainya tetap dan sudah pasti sejak kompilasi (nama dummy).
+  static const _userName = 'Mirulesss';
+
+  // final: diisi sekali saat halaman dibuat. Menyimpan status koneksi Canva.
+  final _canva = CanvaConnection();
+
+  // dispose(): dipanggil saat halaman ditutup, objek _canva dibuang supaya tidak boros memori.
+  @override
+  void dispose() {
+    _canva.dispose();
+    super.dispose();
+  }
+
+  // Navigator.push: membuka halaman baru (form buat gambar). MaterialPageRoute = animasi pindah halaman.
+  void _openAiImage() => Navigator.of(
+    context,
+  ).push(MaterialPageRoute<void>(builder: (_) => const CreateWithAiScreen()));
+
+  // Menampilkan toast singkat di atas layar untuk fitur yang belum tersedia.
+  void _comingSoon() => showTopToast(
+    context,
+    message: 'Fitur ini segera hadir ya!',
+    icon: Icons.hourglass_top_rounded,
+    iconColor: AppColors.amber,
+  );
+
+  // Dipanggil saat item navigasi bawah ditekan. index 0 = Beranda (halaman ini).
+  void _onNavSelected(int index) {
+    if (index == 0) return;
+    // Jadwal, Buat (nanti buat jadwal), Insight, dan Profil belum tersedia.
+    _comingSoon();
+  }
+
+  // build(): menyusun tampilan halaman dari widget. Dipanggil ulang kalau ada perubahan.
   @override
   Widget build(BuildContext context) {
     final now = DateTime.now();
-    return AppPage(
-      padding: const EdgeInsets.fromLTRB(20, 18, 20, 28),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      '${_greeting(now.hour)},',
-                      style: Theme.of(context).textTheme.headlineMedium,
-                    ),
-                    const SizedBox(height: 1),
-                    Text(
-                      '${controller.brandName.split(' ').first} ✨',
-                      style: Theme.of(context).textTheme.headlineMedium,
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      '${_weekdayName(now.weekday)}, ${_monthName(now.month)} ${now.day}, ${now.year} · Demo data',
-                      style: TextStyle(color: AppColors.muted),
-                    ),
-                  ],
-                ),
-              ),
-              InkWell(
-                onTap: onOpenProfile,
-                borderRadius: BorderRadius.circular(30),
-                child: const CircleAvatar(
-                  radius: 25,
-                  backgroundColor: AppColors.surfaceRaised,
-                  child: Text(
-                    'ZN',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 22),
-          const Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              MetricCard(
-                icon: Icons.calendar_month_outlined,
-                value: '12',
-                label: 'Scheduled posts',
-              ),
-              SizedBox(width: 9),
-              MetricCard(
-                icon: Icons.insights_outlined,
-                value: '+8.3%',
-                label: 'Engagement rate',
-                tint: AppColors.teal,
-              ),
-              SizedBox(width: 9),
-              MetricCard(
-                icon: Icons.chat_bubble_outline_rounded,
-                value: '24',
-                label: 'New comments',
-              ),
-            ],
-          ),
-          const SizedBox(height: 25),
-          SectionHeading(
-            title: "Today's Schedule",
-            actionLabel: 'See all',
-            onAction: onOpenSchedule,
-          ),
-          AnimatedBuilder(
-            animation: controller,
-            builder: (context, _) {
-              final posts = controller
-                  .postsOn(DateTime.now())
-                  .where((post) => post.status == PostStatus.scheduled)
-                  .take(2)
-                  .toList();
-              if (posts.isEmpty) {
-                return EmptyState(
-                  title: 'Nothing scheduled yet',
-                  message: 'Create a post and make room for a new idea.',
-                  icon: Icons.calendar_today_outlined,
-                  action: PrimaryButton(
-                    label: 'Create a post',
-                    onPressed: onOpenCreate,
-                    icon: Icons.add,
-                  ),
-                );
-              }
-              return Column(
+    // Scaffold: kerangka halaman (body = isi, bottomNavigationBar = menu bawah).
+    return Scaffold(
+      // SafeArea: supaya isi tidak tertutup notch / status bar.
+      body: SafeArea(
+        // Align(topCenter): isi menempel di atas. Tanpa ini isi ter-center secara vertikal.
+        child: Align(
+          alignment: Alignment.topCenter,
+          // ConstrainedBox: batasi lebar maksimal 620 supaya tetap rapi di layar lebar / web.
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 620),
+            // SingleChildScrollView: isi bisa di-scroll kalau lebih tinggi dari layar.
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.fromLTRB(24, 20, 24, 24),
+              // Column: menyusun widget dari atas ke bawah.
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  for (var index = 0; index < posts.length; index++) ...[
-                    _UpcomingPostTile(
-                      post: posts[index],
-                      seed: index,
-                      onTap: () => onOpenPost(posts[index]),
+                  // Sapaan + tanggal + avatar (widget buatan sendiri, ada di bawah file ini).
+                  _Header(name: _userName, now: now),
+                  const SizedBox(height: 20),
+                  // IntrinsicHeight + Row(stretch): tiga kartu angka dibuat sama tinggi.
+                  const IntrinsicHeight(
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        // MetricCard: kartu angka ringkas (widget buatan sendiri di shared/widgets).
+                        // Lebar dibagi rata oleh Expanded di dalam MetricCard.
+                        MetricCard(
+                          value: '12',
+                          label: 'Postingan terjadwal',
+                          icon: Icons.calendar_today_outlined,
+                        ),
+                        SizedBox(width: 10),
+                        MetricCard(
+                          value: '+8.3%',
+                          label: 'Tingkat engagement',
+                          icon: Icons.calendar_today_outlined,
+                          tint: AppColors.teal,
+                        ),
+                        SizedBox(width: 10),
+                        MetricCard(
+                          value: '24',
+                          label: 'Komentar baru',
+                          icon: Icons.calendar_today_outlined,
+                        ),
+                      ],
                     ),
-                    if (index != posts.length - 1) const SizedBox(height: 10),
-                  ],
-                ],
-              );
-            },
-          ),
-          const SizedBox(height: 22),
-          SurfaceCard(
-            color: AppColors.accentSoft,
-            padding: const EdgeInsets.all(16),
-            child: Row(
-              children: [
-                const Icon(Icons.auto_awesome, color: AppColors.accent),
-                const SizedBox(width: 12),
-                const Expanded(
-                  child: Column(
+                  ),
+                  const SizedBox(height: 26),
+                  // SectionHeading: judul bagian + tombol teks 'Lihat semua'.
+                  SectionHeading(
+                    title: 'Jadwal Hari Ini',
+                    actionLabel: 'Lihat semua',
+                    onAction: _comingSoon,
+                  ),
+                  // Kartu jadwal (data dummy). Dibuat sebagai widget terpisah supaya kode tidak diulang.
+                  const _ScheduleCard(
+                    platform: 'Instagram',
+                    platformIcon: Icons.camera_alt_outlined,
+                    caption: 'Siapin ruang buat ide-ide segar ✦',
+                    meta: '10:30 · Feed post',
+                  ),
+                  const SizedBox(height: 12),
+                  const _ScheduleCard(
+                    platform: 'Facebook',
+                    platformIcon: Icons.facebook_rounded,
+                    caption: 'Intip dikit di balik layar desainnya.',
+                    meta: '14:00 · Page post',
+                  ),
+                  const SizedBox(height: 26),
+                  // Bagian Alat: tiga tombol pintasan fitur.
+                  const SectionHeading(title: 'Alat'),
+                  // Row: tombol alat disusun ke samping. _ToolButton = ikon + label yang bisa ditekan.
+                  Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        'AI Suggestions · Demo',
-                        style: TextStyle(fontWeight: FontWeight.w600),
+                      _ToolButton(
+                        icon: const Icon(Icons.image_outlined, size: 24),
+                        label: 'Buat Gambar',
+                        onTap: _openAiImage,
                       ),
-                      SizedBox(height: 3),
-                      Text(
-                        'Your audience is most active at 6 PM.',
-                        style: TextStyle(color: AppColors.muted, fontSize: 12),
+                      const SizedBox(width: 12),
+                      _ToolButton(
+                        icon: Image.asset(
+                          'assets/img/canva_logo.png',
+                          width: 28,
+                          height: 28,
+                          filterQuality: FilterQuality.high,
+                        ),
+                        label: 'Canva',
+                        // Canva: cek koneksi dulu (popup status / hubungkan). Kalau sudah terhubung, buka form Canva.
+                        onTap: () => openCanva(context, _canva),
+                      ),
+                      const SizedBox(width: 12),
+                      _ToolButton(
+                        icon: const Icon(Icons.layers_clear_outlined, size: 24),
+                        label: 'Hapus BG',
+                        onTap: _comingSoon,
                       ),
                     ],
                   ),
-                ),
-                IconButton(
-                  tooltip: 'View comments',
-                  onPressed: onOpenComments,
-                  color: AppColors.accent,
-                  icon: const Icon(Icons.arrow_forward_rounded),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
-          const SizedBox(height: 24),
-          SectionHeading(
-            title: 'Recent Performance',
-            actionLabel: 'Insights',
-            onAction: onOpenInsights,
-          ),
-          const SurfaceCard(
-            padding: EdgeInsets.fromLTRB(16, 15, 16, 12),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Text(
-                      '+12.4%',
-                      style: TextStyle(
-                        color: AppColors.teal,
-                        fontSize: 24,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                    SizedBox(width: 8),
-                    Text(
-                      'vs. previous week',
-                      style: TextStyle(color: AppColors.muted, fontSize: 12),
-                    ),
-                  ],
-                ),
-                SizedBox(height: 8),
-                SizedBox(height: 110, child: _PerformanceChart()),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text('Mon', style: TextStyle(color: AppColors.muted)),
-                    Text('Tue', style: TextStyle(color: AppColors.muted)),
-                    Text('Wed', style: TextStyle(color: AppColors.muted)),
-                    Text('Thu', style: TextStyle(color: AppColors.muted)),
-                    Text('Fri', style: TextStyle(color: AppColors.muted)),
-                    Text('Sat', style: TextStyle(color: AppColors.muted)),
-                    Text('Sun', style: TextStyle(color: AppColors.muted)),
-                  ],
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 24),
-          PrimaryButton(
-            label: 'Create with AI',
-            onPressed: onOpenCreate,
-            icon: Icons.auto_awesome,
-          ),
-        ],
+        ),
+      ),
+      // Menu navigasi bawah (NavigationBar). selectedIndex 0 = tab Beranda aktif.
+      bottomNavigationBar: AppBottomNavigation(
+        selectedIndex: 0,
+        onSelected: _onNavSelected,
       ),
     );
   }
 }
 
-class _UpcomingPostTile extends StatelessWidget {
-  const _UpcomingPostTile({
-    required this.post,
-    required this.seed,
-    required this.onTap,
-  });
+// StatelessWidget: tampilan tetap, tidak menyimpan state sendiri.
+// Isinya dikirim lewat parameter (name, now).
+class _Header extends StatelessWidget {
+  const _Header({required this.name, required this.now});
 
-  final SocialPost post;
-  final int seed;
-  final VoidCallback onTap;
+  final String name;
+  final DateTime now;
+
+  // List: daftar nama hari dan bulan, dipakai untuk memformat tanggal.
+  static const _days = [
+    'Senin',
+    'Selasa',
+    'Rabu',
+    'Kamis',
+    'Jumat',
+    'Sabtu',
+    'Minggu',
+  ];
+  static const _months = [
+    'Januari',
+    'Februari',
+    'Maret',
+    'April',
+    'Mei',
+    'Juni',
+    'Juli',
+    'Agustus',
+    'September',
+    'Oktober',
+    'November',
+    'Desember',
+  ];
+
+  // getter: dihitung dari jam sekarang, jadi sapaan berubah otomatis (pagi / siang / sore / malam).
+  String get _greeting {
+    final hour = now.hour;
+    if (hour < 11) return 'Selamat pagi';
+    if (hour < 15) return 'Selamat siang';
+    if (hour < 18) return 'Selamat sore';
+    return 'Selamat malam';
+  }
+
+  // Menyusun tanggal bahasa Indonesia dari list _days dan _months.
+  String get _date =>
+      '${_days[now.weekday - 1]}, ${now.day} ${_months[now.month - 1]} '
+      '${now.year}';
 
   @override
   Widget build(BuildContext context) {
+    // Ambil maksimal 3 huruf pertama nama untuk avatar (ternary: kondisi ? ya : tidak).
+    final initials = name.length > 3 ? name.substring(0, 3) : name;
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                '$_greeting,\n$name',
+                style: Theme.of(context).textTheme.headlineMedium,
+              ),
+              const SizedBox(height: 8),
+              Text(_date, style: Theme.of(context).textTheme.bodyMedium),
+            ],
+          ),
+        ),
+        const SizedBox(width: 12),
+        // CircleAvatar: lingkaran avatar berisi inisial nama.
+        CircleAvatar(
+          radius: 20,
+          backgroundColor: AppColors.surfaceRaised,
+          child: Text(
+            initials,
+            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+// Kartu satu jadwal posting: platform, status, caption, dan jam.
+class _ScheduleCard extends StatelessWidget {
+  const _ScheduleCard({
+    required this.platform,
+    required this.platformIcon,
+    required this.caption,
+    required this.meta,
+  });
+
+  final String platform;
+  final IconData platformIcon;
+  final String caption;
+  final String meta;
+
+  @override
+  Widget build(BuildContext context) {
+    // SurfaceCard: kartu dasar (latar + border + bayangan tipis).
     return SurfaceCard(
-      onTap: onTap,
-      padding: const EdgeInsets.all(11),
+      padding: const EdgeInsets.all(14),
       child: Row(
         children: [
-          SizedBox(
-            width: 58,
-            height: 58,
-            child: GeneratedArtwork(height: 58, seed: seed),
-          ),
-          const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
                   children: [
-                    SocialPlatformIcon(platform: post.platform, size: 15),
-                    const SizedBox(width: 5),
-                    Text(
-                      post.platform,
-                      style: const TextStyle(
-                        color: AppColors.muted,
-                        fontSize: 12,
+                    Icon(platformIcon, size: 14, color: Colors.white),
+                    const SizedBox(width: 6),
+                    Expanded(
+                      child: Text(
+                        platform,
+                        style: const TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
                     ),
-                    const Spacer(),
-                    StatusPill(status: post.status),
+                    // StatusPill: chip kecil penanda status ('Terjadwal').
+                    const StatusPill(
+                      label: 'Terjadwal',
+                      color: AppColors.muted,
+                    ),
                   ],
                 ),
-                const SizedBox(height: 7),
+                const SizedBox(height: 6),
                 Text(
-                  post.caption,
+                  caption,
+                  // maxLines 1 + ellipsis: caption yang kepanjangan dipotong jadi '...'.
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(fontWeight: FontWeight.w500),
+                  style: const TextStyle(fontSize: 14),
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  '${_shortDate(post.scheduledAt)} · ${_formatTime(post.scheduledAt)}',
+                  meta,
                   style: const TextStyle(color: AppColors.muted, fontSize: 11),
                 ),
               ],
@@ -300,109 +323,50 @@ class _UpcomingPostTile extends StatelessWidget {
   }
 }
 
-String _shortDate(DateTime date) => '${_monthName(date.month)} ${date.day}';
+// Tombol alat: kotak ikon + label. Ikon dikirim sebagai Widget supaya bisa Icon atau Image.
+class _ToolButton extends StatelessWidget {
+  const _ToolButton({
+    required this.icon,
+    required this.label,
+    required this.onTap,
+  });
 
-String _formatTime(DateTime date) {
-  final hour = date.hour.toString().padLeft(2, '0');
-  final minute = date.minute.toString().padLeft(2, '0');
-  return '$hour:$minute';
-}
-
-String _monthName(int month) => const [
-  'Jan',
-  'Feb',
-  'Mar',
-  'Apr',
-  'May',
-  'Jun',
-  'Jul',
-  'Aug',
-  'Sep',
-  'Oct',
-  'Nov',
-  'Dec',
-][month - 1];
-
-String _weekdayName(int weekday) => const [
-  'Monday',
-  'Tuesday',
-  'Wednesday',
-  'Thursday',
-  'Friday',
-  'Saturday',
-  'Sunday',
-][weekday - 1];
-
-String _greeting(int hour) {
-  if (hour < 12) return 'Good morning';
-  if (hour < 17) return 'Good afternoon';
-  return 'Good evening';
-}
-
-class _PerformanceChart extends StatelessWidget {
-  const _PerformanceChart();
+  final Widget icon;
+  final String label;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    return CustomPaint(
-      painter: _PerformanceChartPainter(),
-      child: const SizedBox.expand(),
-    );
-  }
-}
-
-class _PerformanceChartPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final gridPaint = Paint()
-      ..color = AppColors.border
-      ..strokeWidth = 1;
-    for (var row = 1; row <= 3; row++) {
-      final y = size.height * row / 4;
-      canvas.drawLine(Offset(0, y), Offset(size.width, y), gridPaint);
-    }
-
-    const values = [0.72, 0.62, 0.69, 0.43, 0.49, 0.31, 0.38, 0.21, 0.28];
-    final path = Path();
-    for (var index = 0; index < values.length; index++) {
-      final point = Offset(
-        size.width * index / (values.length - 1),
-        size.height * values[index],
-      );
-      if (index == 0) {
-        path.moveTo(point.dx, point.dy);
-      } else {
-        path.lineTo(point.dx, point.dy);
-      }
-    }
-
-    final fillPath = Path.from(path)
-      ..lineTo(size.width, size.height)
-      ..lineTo(0, size.height)
-      ..close();
-    canvas.drawPath(
-      fillPath,
-      Paint()
-        ..shader = LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [
-            AppColors.teal.withValues(alpha: 0.18),
-            AppColors.teal.withValues(alpha: 0.01),
+    // InkWell: membuat area bisa ditekan, dengan efek riak.
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(16),
+      // SizedBox: kotak lebar tetap 76 supaya ketiga alat sejajar.
+      child: SizedBox(
+        width: 76,
+        child: Column(
+          children: [
+            // Container: kotak ikon dengan warna, border, dan sudut membulat (BoxDecoration).
+            Container(
+              width: 56,
+              height: 56,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: AppColors.surface,
+                border: Border.all(color: AppColors.border),
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: icon,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              label,
+              textAlign: TextAlign.center,
+              style: const TextStyle(color: AppColors.muted, fontSize: 11),
+            ),
           ],
-        ).createShader(Offset.zero & size),
-    );
-    canvas.drawPath(
-      path,
-      Paint()
-        ..color = AppColors.teal
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 2.5
-        ..strokeCap = StrokeCap.round
-        ..strokeJoin = StrokeJoin.round,
+        ),
+      ),
     );
   }
-
-  @override
-  bool shouldRepaint(_PerformanceChartPainter oldDelegate) => false;
 }

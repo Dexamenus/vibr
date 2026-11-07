@@ -25,27 +25,27 @@ class AppBottomNavigation extends StatelessWidget {
         NavigationDestination(
           icon: Icon(Icons.home_outlined),
           selectedIcon: Icon(Icons.home_rounded),
-          label: 'Home',
+          label: 'Beranda',
         ),
         NavigationDestination(
           icon: Icon(Icons.calendar_month_outlined),
           selectedIcon: Icon(Icons.calendar_month_rounded),
-          label: 'Schedule',
+          label: 'Jadwal',
         ),
         NavigationDestination(
           icon: Icon(Icons.add_circle_outline_rounded),
           selectedIcon: Icon(Icons.add_circle_rounded),
-          label: 'Create',
+          label: 'Buat',
         ),
         NavigationDestination(
           icon: Icon(Icons.insights_outlined),
           selectedIcon: Icon(Icons.insights_rounded),
-          label: 'Insights',
+          label: 'Insight',
         ),
         NavigationDestination(
           icon: Icon(Icons.person_outline_rounded),
           selectedIcon: Icon(Icons.person_rounded),
-          label: 'Profile',
+          label: 'Profil',
         ),
       ],
     );
