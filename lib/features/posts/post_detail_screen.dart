@@ -1,198 +1,206 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 import '../../core/models/app_models.dart';
-import '../../core/state/app_controller.dart';
 import '../../core/theme/app_theme.dart';
-import '../../shared/widgets/app_page.dart';
-import '../../shared/widgets/generated_artwork.dart';
-import '../../shared/widgets/metric_card.dart';
 import '../../shared/widgets/primary_button.dart';
-import '../../shared/widgets/screen_header.dart';
-import '../../shared/widgets/secondary_button.dart';
-import '../../shared/widgets/section_heading.dart';
-import '../../shared/widgets/show_demo_message.dart';
 import '../../shared/widgets/social_platform_icon.dart';
-import '../../shared/widgets/status_pill.dart';
-import '../create/generated_result_screen.dart';
+import '../../shared/widgets/show_demo_message.dart';
 
 class PostDetailScreen extends StatelessWidget {
-  const PostDetailScreen({
-    super.key,
-    required this.controller,
-    required this.post,
-    required this.onChanged,
-    required this.onOpenComments,
-  });
+  const PostDetailScreen({super.key, required this.post});
 
-  final AppController controller;
   final SocialPost post;
-  final VoidCallback onChanged;
-  final VoidCallback onOpenComments;
 
   @override
   Widget build(BuildContext context) {
-    final date = post.scheduledAt;
     return Scaffold(
-      body: AppPage(
-        padding: const EdgeInsets.fromLTRB(20, 18, 20, 30),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            ScreenHeader(
-              title: 'Post Detail',
-              leading: IconButton(
-                tooltip: 'Back',
-                onPressed: () => Navigator.of(context).pop(),
-                icon: const Icon(Icons.arrow_back),
-              ),
-            ),
-            Row(
-              children: [
-                SocialPlatformIcon(platform: post.platform),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    '${post.platform} · ${post.format}',
-                    style: const TextStyle(color: AppColors.muted),
+      backgroundColor: AppColors.background,
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Row(
+                children: [
+                  IconButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    tooltip: 'Kembali',
+                    icon: const Icon(Icons.arrow_back_rounded),
                   ),
-                ),
-                StatusPill(status: post.status),
-              ],
-            ),
-            const SizedBox(height: 8),
-            Text(
-              '${_monthLabel(date.month)} ${date.day}, ${date.year} · ${TimeOfDay.fromDateTime(date).format(context)}',
-              style: const TextStyle(color: AppColors.muted),
-            ),
-            const SizedBox(height: 19),
-            const GeneratedArtwork(height: 310, seed: 3),
-            const SizedBox(height: 17),
-            Text(
-              post.caption,
-              style: const TextStyle(fontSize: 15, height: 1.45),
-            ),
-            const SizedBox(height: 20),
-            const SectionHeading(title: 'Performance'),
-            const Row(
-              children: [
-                MetricCard(value: '312', label: 'Likes'),
-                SizedBox(width: 9),
-                MetricCard(value: '28', label: 'Comments'),
-                SizedBox(width: 9),
-                MetricCard(value: '42', label: 'Saves'),
-              ],
-            ),
-            const SizedBox(height: 10),
-            const Row(
-              children: [
-                MetricCard(value: '4.8%', label: 'Engagement rate'),
-                SizedBox(width: 9),
-                MetricCard(value: '1.2K', label: 'Reach'),
-              ],
-            ),
-            const SizedBox(height: 22),
-            if (post.status == PostStatus.scheduled)
-              PrimaryButton(
-                label: 'Edit scheduled post',
-                icon: Icons.edit_outlined,
-                onPressed: () => _edit(context),
-              )
-            else
-              PrimaryButton(
-                label: 'View comments',
-                icon: Icons.chat_bubble_outline,
-                onPressed: () {
-                  Navigator.of(context).pop();
-                  onOpenComments();
-                },
+                  const SizedBox(width: 4),
+                  const Text(
+                    'Detail Postingan',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 20,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ],
               ),
-            const SizedBox(height: 10),
-            if (post.status == PostStatus.scheduled)
-              SecondaryButton(
-                label: 'Cancel scheduled post',
-                icon: Icons.delete_outline,
-                onPressed: () => _confirmDelete(context),
-              )
-            else
-              SecondaryButton(
-                label: 'Create a similar post',
-                icon: Icons.add,
-                onPressed: () => showDemoMessage(
-                  context,
-                  'Open Create to make a new version of this post.',
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  for (final platform in post.targetPlatforms) ...[
+                    SocialPlatformIcon(platform: platform, size: 15),
+                    const SizedBox(width: 5),
+                  ],
+                  Expanded(
+                    child: Text(
+                      '${post.targetPlatforms.join(' · ')} · ${post.format}',
+                      style: const TextStyle(
+                        color: AppColors.muted,
+                        fontSize: 11,
+                      ),
+                    ),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 9,
+                      vertical: 5,
+                    ),
+                    decoration: BoxDecoration(
+                      color: post.status.color.withValues(alpha: 0.12),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Text(
+                      post.status.label,
+                      style: TextStyle(
+                        color: post.status.color,
+                        fontSize: 10,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 6),
+              Text(
+                DateFormat(
+                  'd MMMM yyyy · HH.mm',
+                  'id_ID',
+                ).format(post.scheduledAt),
+                style: const TextStyle(color: AppColors.muted, fontSize: 11),
+              ),
+              const SizedBox(height: 16),
+              Center(
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(18),
+                  child: post.imageBytes == null
+                      ? Image.asset(
+                          'assets/img/Violet orbits artwork.png',
+                          width: 250,
+                          height: 250,
+                          fit: BoxFit.cover,
+                        )
+                      : Image.memory(
+                          post.imageBytes!,
+                          width: 250,
+                          height: 250,
+                          fit: BoxFit.cover,
+                        ),
                 ),
               ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  void _edit(BuildContext context) {
-    final draft = PostDraft(
-      prompt: post.caption,
-      caption: post.caption,
-      platform: post.platform,
-      tone: 'Casual',
-      style: 'Illustration',
-      format: post.format,
-    );
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (_) => NewPostScreen(
-          controller: controller,
-          draft: draft,
-          existingPost: post,
-          onScheduled: () {
-            onChanged();
-          },
-        ),
-      ),
-    );
-  }
-
-  Future<void> _confirmDelete(BuildContext context) async {
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Cancel this post?'),
-        content: const Text(
-          'This post will be removed from your local schedule.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('Keep post'),
+              const SizedBox(height: 14),
+              Text(
+                post.caption,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 13,
+                  height: 1.5,
+                ),
+              ),
+              const SizedBox(height: 20),
+              Row(
+                children: const [
+                  Expanded(
+                    child: Text(
+                      'Performa',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                  Text(
+                    'Analitik demo',
+                    style: TextStyle(color: AppColors.muted, fontSize: 10),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 10),
+              const Row(
+                children: [
+                  Expanded(
+                    child: _MetricTile(value: '312', label: 'Suka'),
+                  ),
+                  SizedBox(width: 8),
+                  Expanded(
+                    child: _MetricTile(value: '28', label: 'Komentar'),
+                  ),
+                  SizedBox(width: 8),
+                  Expanded(
+                    child: _MetricTile(value: '42', label: 'Dibagikan'),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 18),
+              const Text(
+                'Contoh analitik · Bukan data langsung dari platform',
+                textAlign: TextAlign.center,
+                style: TextStyle(color: AppColors.muted, fontSize: 10),
+              ),
+              const SizedBox(height: 16),
+              PrimaryButton(
+                label: 'Lihat komentar · 28',
+                icon: Icons.chat_bubble_outline_rounded,
+                onPressed: () =>
+                    showDemoMessage(context, 'Fitur komentar segera hadir.'),
+              ),
+            ],
           ),
-          FilledButton(
-            onPressed: () => Navigator.of(context).pop(true),
-            child: const Text('Cancel post'),
+        ),
+      ),
+    );
+  }
+}
+
+class _MetricTile extends StatelessWidget {
+  const _MetricTile({required this.value, required this.label});
+
+  final String value;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(13),
+        border: Border.all(color: AppColors.border.withValues(alpha: 0.65)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            value,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 18,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            label,
+            style: const TextStyle(color: AppColors.muted, fontSize: 10),
           ),
         ],
       ),
     );
-    if (confirmed != true || !context.mounted) return;
-    controller.deletePost(post.id);
-    final messenger = ScaffoldMessenger.of(context);
-    Navigator.of(context).pop();
-    messenger.showSnackBar(
-      const SnackBar(content: Text('Post removed from your schedule.')),
-    );
-    onChanged();
   }
 }
-
-String _monthLabel(int month) => const [
-  'January',
-  'February',
-  'March',
-  'April',
-  'May',
-  'June',
-  'July',
-  'August',
-  'September',
-  'October',
-  'November',
-  'December',
-][month - 1];

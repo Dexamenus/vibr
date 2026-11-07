@@ -7,27 +7,27 @@ class AppController extends ChangeNotifier {
     _posts = [
       SocialPost(
         id: 'post-oct-27',
-        caption: 'Violet orbits. A mint spark. ✦ Make room for fresh ideas.',
+        caption: 'Orbit ungu. Kilau mint. ✦ Sambut ide-ide segar.',
         platform: 'Instagram',
-        scheduledAt: DateTime(2026, 10, 31, 9),
+        scheduledAt: DateTime.now().add(const Duration(days: 1)),
         status: PostStatus.scheduled,
-        format: '1:1 image',
+        format: 'Gambar 1:1',
       ),
       SocialPost(
         id: 'post-oct-28',
-        caption: 'A little color for the middle of your week.',
+        caption: 'Sedikit warna untuk menyemarakkan tengah pekanmu.',
         platform: 'Instagram',
         scheduledAt: DateTime(2026, 10, 23, 12, 30),
         status: PostStatus.published,
-        format: 'Carousel',
+        format: 'Karosel',
       ),
       SocialPost(
         id: 'post-oct-30',
-        caption: 'Small ideas can make a big difference.',
+        caption: 'Ide sederhana bisa membawa perubahan besar.',
         platform: 'Facebook',
-        scheduledAt: DateTime(2026, 11, 2, 16),
+        scheduledAt: DateTime.now().add(const Duration(days: 3)),
         status: PostStatus.scheduled,
-        format: '1:1 image',
+        format: 'Gambar 1:1',
       ),
     ];
     _comments = [
@@ -35,8 +35,8 @@ class AppController extends ChangeNotifier {
         id: 'comment-1',
         author: 'Maya Putri',
         handle: '@mayaputri',
-        message: 'Could you share a casual tutorial for this design?',
-        postTitle: 'Violet orbits. A mint spark. ✦',
+        message: 'Bisa berbagi tutorial santai untuk desain ini?',
+        postTitle: 'Orbit ungu. Kilau mint. ✦',
         sentiment: CommentSentiment.question,
         receivedAt: DateTime(2026, 10, 31, 10, 15),
         isPriority: true,
@@ -45,8 +45,8 @@ class AppController extends ChangeNotifier {
         id: 'comment-2',
         author: 'Dita S.',
         handle: '@ditastudio',
-        message: 'The colors are beautiful! Love this so much ✨',
-        postTitle: 'Make room for fresh ideas',
+        message: 'Warnanya indah! Aku suka sekali ✨',
+        postTitle: 'Sambut ide-ide segar',
         sentiment: CommentSentiment.positive,
         receivedAt: DateTime(2026, 10, 31, 9, 40),
       ),
@@ -54,8 +54,8 @@ class AppController extends ChangeNotifier {
         id: 'comment-3',
         author: 'Andi K.',
         handle: '@andikreatif',
-        message: 'What time do you usually post your new work?',
-        postTitle: 'A little color for your week',
+        message: 'Biasanya pukul berapa kamu mengunggah karya baru?',
+        postTitle: 'Sedikit warna untuk pekanmu',
         sentiment: CommentSentiment.question,
         receivedAt: DateTime(2026, 10, 30, 18, 20),
       ),
@@ -63,8 +63,8 @@ class AppController extends ChangeNotifier {
         id: 'comment-4',
         author: 'Studio North',
         handle: '@studionorth',
-        message: 'Not my style, but the effort is clear.',
-        postTitle: 'Violet orbits. A mint spark. ✦',
+        message: 'Bukan gayaku, tetapi usahanya terlihat.',
+        postTitle: 'Orbit ungu. Kilau mint. ✦',
         sentiment: CommentSentiment.negative,
         receivedAt: DateTime(2026, 10, 30, 16, 5),
       ),
@@ -72,8 +72,8 @@ class AppController extends ChangeNotifier {
         id: 'comment-5',
         author: 'promo_daily',
         handle: '@promo_daily',
-        message: 'Get thousands of followers today! Click our bio.',
-        postTitle: 'Make room for fresh ideas',
+        message: 'Dapatkan ribuan pengikut hari ini! Klik bio kami.',
+        postTitle: 'Sambut ide-ide segar',
         sentiment: CommentSentiment.spam,
         receivedAt: DateTime(2026, 10, 30, 14),
       ),
@@ -111,28 +111,34 @@ class AppController extends ChangeNotifier {
       });
 
   void updateBrandName(String value) {
-    brandName = value.trim().isEmpty ? 'Your brand' : value.trim();
+    brandName = value.trim().isEmpty ? 'Merek Anda' : value.trim();
     notifyListeners();
   }
 
-  void addPost({
+  SocialPost addPost({
     required String caption,
     required String platform,
+    List<String>? platforms,
     required DateTime scheduledAt,
     required String format,
+    Uint8List? imageBytes,
+    String? imageName,
     PostStatus status = PostStatus.scheduled,
   }) {
-    _posts.add(
-      SocialPost(
-        id: 'post-${DateTime.now().microsecondsSinceEpoch}',
-        caption: caption,
-        platform: platform,
-        scheduledAt: scheduledAt,
-        status: status,
-        format: format,
-      ),
+    final post = SocialPost(
+      id: 'post-${DateTime.now().microsecondsSinceEpoch}',
+      caption: caption,
+      platform: platforms?.first ?? platform,
+      platforms: platforms ?? [platform],
+      scheduledAt: scheduledAt,
+      status: status,
+      format: format,
+      imageBytes: imageBytes,
+      imageName: imageName,
     );
+    _posts.add(post);
     notifyListeners();
+    return post;
   }
 
   void deletePost(String id) {

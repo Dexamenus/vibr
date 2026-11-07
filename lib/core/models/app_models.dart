@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 
 enum PostStatus { scheduled, published, draft }
@@ -11,30 +13,47 @@ class SocialPost {
     required this.platform,
     required this.scheduledAt,
     required this.status,
-    this.format = 'Image',
+    this.platforms = const [],
+    this.format = 'Gambar',
+    this.imageBytes,
+    this.imageName,
   });
 
   final String id;
   final String caption;
   final String platform;
+  final List<String> platforms;
   final DateTime scheduledAt;
   final PostStatus status;
   final String format;
+  final Uint8List? imageBytes;
+  final String? imageName;
+
+  List<String> get targetPlatforms =>
+      platforms.isEmpty ? [platform] : platforms;
 
   SocialPost copyWith({
     String? caption,
     String? platform,
+    List<String>? platforms,
     DateTime? scheduledAt,
     PostStatus? status,
     String? format,
+    Uint8List? imageBytes,
+    String? imageName,
   }) {
+    final updatedPlatforms =
+        platforms ?? (platform == null ? targetPlatforms : [platform]);
     return SocialPost(
       id: id,
       caption: caption ?? this.caption,
-      platform: platform ?? this.platform,
+      platform: updatedPlatforms.first,
+      platforms: updatedPlatforms,
       scheduledAt: scheduledAt ?? this.scheduledAt,
       status: status ?? this.status,
       format: format ?? this.format,
+      imageBytes: imageBytes ?? this.imageBytes,
+      imageName: imageName ?? this.imageName,
     );
   }
 }
@@ -97,9 +116,9 @@ class SocialComment {
 
 extension PostStatusLabel on PostStatus {
   String get label => switch (this) {
-    PostStatus.scheduled => 'Scheduled',
-    PostStatus.published => 'Published',
-    PostStatus.draft => 'Draft',
+    PostStatus.scheduled => 'Terjadwal',
+    PostStatus.published => 'Dipublikasikan',
+    PostStatus.draft => 'Draf',
   };
 
   Color get color => switch (this) {
@@ -111,9 +130,9 @@ extension PostStatusLabel on PostStatus {
 
 extension CommentSentimentLabel on CommentSentiment {
   String get label => switch (this) {
-    CommentSentiment.positive => 'Positive',
-    CommentSentiment.question => 'Question',
-    CommentSentiment.negative => 'Negative',
+    CommentSentiment.positive => 'Positif',
+    CommentSentiment.question => 'Pertanyaan',
+    CommentSentiment.negative => 'Negatif',
     CommentSentiment.spam => 'Spam',
   };
 }
