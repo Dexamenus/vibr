@@ -56,7 +56,10 @@ class ScheduleCard extends StatelessWidget {
               ),
               Row(
                 children: [
-                  StatusPill(status: post.status),
+                  StatusPill(
+                    label: post.status.label,
+                    color: post.status.color,
+                  ),
                   const SizedBox(width: 8),
                   GestureDetector(
                     onTap: onDelete,
