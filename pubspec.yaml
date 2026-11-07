@@ -38,6 +38,7 @@ dependencies:
   cupertino_icons: ^1.0.8
   intl: ^0.20.3
   file_picker: ^13.3.2
+  image_picker: ^1.2.4
 
 dev_dependencies:
   flutter_test:
@@ -63,7 +64,7 @@ flutter:
   uses-material-design: true
 
   assets:
-    - assets/img/Violet orbits artwork.png
+    - assets/img/
 
   # To add assets to your application, add an assets section, like this:
   # assets:
