@@ -19,6 +19,7 @@ class ScheduleScreen extends StatefulWidget {
     required this.onPostEdit,
     required this.onNavigationSelected,
     this.initialSelectedDate,
+    this.showBottomNavigation = true,
   });
 
   final AppController controller;
@@ -27,6 +28,7 @@ class ScheduleScreen extends StatefulWidget {
   final ValueChanged<SocialPost> onPostEdit;
   final ValueChanged<int> onNavigationSelected;
   final DateTime? initialSelectedDate;
+  final bool showBottomNavigation;
 
   @override
   State<ScheduleScreen> createState() => _ScheduleScreenState();
@@ -133,13 +135,15 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
           ),
         ),
       ),
-      bottomNavigationBar: SafeArea(
-        top: false,
-        child: AppBottomNavigation(
-          selectedIndex: 1,
-          onSelected: widget.onNavigationSelected,
-        ),
-      ),
+      bottomNavigationBar: widget.showBottomNavigation
+          ? SafeArea(
+              top: false,
+              child: AppBottomNavigation(
+                selectedIndex: 1,
+                onSelected: widget.onNavigationSelected,
+              ),
+            )
+          : null,
     );
   }
 

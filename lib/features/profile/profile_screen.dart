@@ -11,7 +11,9 @@ import 'notifications/notifications_screen.dart';
 import 'library/library_screen.dart';
 
 class ProfileScreen extends StatelessWidget {
-  const ProfileScreen({super.key});
+  const ProfileScreen({super.key, this.onBack});
+
+  final VoidCallback? onBack;
 
   @override
   Widget build(BuildContext context) {
@@ -25,9 +27,7 @@ class ProfileScreen extends StatelessWidget {
             Row(
               children: [
                 InkWell(
-                  onTap: () {
-                    Navigator.maybePop(context);
-                  },
+                  onTap: onBack ?? () => Navigator.maybePop(context),
                   child: const Icon(Icons.arrow_back, color: Colors.white),
                 ),
                 const SizedBox(width: 16),

@@ -14,7 +14,16 @@ import '../create/create_with_ai_screen.dart';
 // HomeScreen = halaman Beranda. Pakai StatefulWidget karena menyimpan objek yang
 // hidup selama halaman ada (CanvaConnection) dan perlu dibuang di dispose().
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  const HomeScreen({
+    super.key,
+    this.onNavigationSelected,
+    this.onOpenSchedule,
+    this.showBottomNavigation = true,
+  });
+
+  final ValueChanged<int>? onNavigationSelected;
+  final VoidCallback? onOpenSchedule;
+  final bool showBottomNavigation;
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -50,6 +59,10 @@ class _HomeScreenState extends State<HomeScreen> {
   // Dipanggil saat item navigasi bawah ditekan. index 0 = Beranda (halaman ini).
   void _onNavSelected(int index) {
     if (index == 0) return;
+    if (index == 1 && widget.onOpenSchedule != null) {
+      widget.onOpenSchedule!();
+      return;
+    }
     // Jadwal, Buat (nanti buat jadwal), Insight, dan Profil belum tersedia.
     _comingSoon();
   }
@@ -111,7 +124,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   SectionHeading(
                     title: 'Jadwal Hari Ini',
                     actionLabel: 'Lihat semua',
-                    onAction: _comingSoon,
+                    onAction: widget.onOpenSchedule ?? _comingSoon,
                   ),
                   // Kartu jadwal (data dummy). Dibuat sebagai widget terpisah supaya kode tidak diulang.
                   const _ScheduleCard(
@@ -166,10 +179,12 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       ),
       // Menu navigasi bawah (NavigationBar). selectedIndex 0 = tab Beranda aktif.
-      bottomNavigationBar: AppBottomNavigation(
-        selectedIndex: 0,
-        onSelected: _onNavSelected,
-      ),
+      bottomNavigationBar: widget.showBottomNavigation
+          ? AppBottomNavigation(
+              selectedIndex: 0,
+              onSelected: widget.onNavigationSelected ?? _onNavSelected,
+            )
+          : null,
     );
   }
 }

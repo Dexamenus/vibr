@@ -22,6 +22,7 @@ class CreateScreen extends StatefulWidget {
     required this.onPostPublished,
     required this.onPostUpdated,
     this.initialPost,
+    this.showBottomNavigation = true,
   });
 
   final AppController controller;
@@ -30,6 +31,7 @@ class CreateScreen extends StatefulWidget {
   final ValueChanged<SocialPost> onPostPublished;
   final ValueChanged<DateTime> onPostUpdated;
   final SocialPost? initialPost;
+  final bool showBottomNavigation;
 
   @override
   State<CreateScreen> createState() => _CreateScreenState();
@@ -222,13 +224,15 @@ class _CreateScreenState extends State<CreateScreen> {
           ),
         ),
       ),
-      bottomNavigationBar: SafeArea(
-        top: false,
-        child: AppBottomNavigation(
-          selectedIndex: 2,
-          onSelected: widget.onNavigationSelected,
-        ),
-      ),
+      bottomNavigationBar: widget.showBottomNavigation
+          ? SafeArea(
+              top: false,
+              child: AppBottomNavigation(
+                selectedIndex: 2,
+                onSelected: widget.onNavigationSelected,
+              ),
+            )
+          : null,
     );
   }
 

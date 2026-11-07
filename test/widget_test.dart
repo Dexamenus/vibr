@@ -4,7 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:vibr/app.dart';
 
 void main() {
-  testWidgets('Calendar schedule preview is shown when the app launches', (
+  testWidgets('Home screen is shown when the app launches', (
     WidgetTester tester,
   ) async {
     await tester.pumpWidget(const SociAiApp());
@@ -15,31 +15,42 @@ void main() {
     );
     expect(find.text('Beranda'), findsOneWidget);
     expect(find.text('Buat'), findsOneWidget);
-    expect(find.text('Jadwal'), findsNWidgets(2));
-    expect(find.text('Month'), findsNothing);
-    expect(find.text('Week'), findsNothing);
-    expect(find.text('1 Postingan'), findsOneWidget);
-    expect(
-      find.text('Orbit ungu. Kilau mint. ✦ Sambut ide-ide segar.'),
-      findsOneWidget,
-    );
-    expect(
-      find.byWidgetPredicate(
-        (widget) =>
-            widget is Image &&
-            widget.image is AssetImage &&
-            (widget.image as AssetImage).assetName ==
-                'assets/img/Violet orbits artwork.png',
-      ),
-      findsOneWidget,
-    );
-    expect(find.text('Dipublikasikan'), findsNothing);
+    expect(find.text('Jadwal Hari Ini'), findsOneWidget);
+    expect(find.text('12'), findsOneWidget);
+  });
+
+  testWidgets('Bottom navigation opens each destination', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(const SociAiApp());
+
+    await tester.tap(find.text('Jadwal'));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const ValueKey('month-year-picker')), findsOneWidget);
+
+    await tester.tap(find.text('Buat'));
+    await tester.pumpAndSettle();
+    expect(find.text('Jadwal Baru'), findsOneWidget);
+
+    await tester.tap(find.text('Insight'));
+    await tester.pumpAndSettle();
+    expect(find.text('Analitik akan segera hadir.'), findsOneWidget);
+
+    await tester.tap(find.text('Profil'));
+    await tester.pumpAndSettle();
+    expect(find.text('Faizal Isman'), findsOneWidget);
+
+    await tester.tap(find.byIcon(Icons.arrow_back));
+    await tester.pumpAndSettle();
+    expect(find.text('Jadwal Hari Ini'), findsOneWidget);
   });
 
   testWidgets('Month and year can be selected from the calendar header', (
     WidgetTester tester,
   ) async {
     await tester.pumpWidget(const SociAiApp());
+    await tester.tap(find.text('Jadwal'));
+    await tester.pumpAndSettle();
 
     final initialYear = DateTime.now().add(const Duration(days: 1)).year;
     await tester.tap(find.byKey(const ValueKey('month-year-picker')));
@@ -208,6 +219,8 @@ void main() {
     WidgetTester tester,
   ) async {
     await tester.pumpWidget(const SociAiApp());
+    await tester.tap(find.text('Jadwal'));
+    await tester.pumpAndSettle();
     const postId = 'post-oct-27';
     await tester.tap(find.byKey(const ValueKey('post-options-$postId')));
     await tester.pumpAndSettle();
