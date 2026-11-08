@@ -6,26 +6,21 @@ import 'core/state/app_controller.dart';
 import 'core/theme/app_theme.dart';
 import 'features/create/create_screen.dart';
 import 'features/home/home_screen.dart';
+import 'features/insights/insights_screen.dart';
 import 'features/posts/post_detail_screen.dart';
 import 'features/profile/profile_screen.dart';
 import 'features/schedule/schedule_screen.dart';
 import 'shared/widgets/app_bottom_navigation.dart';
 
-class SociAiApp extends StatefulWidget {
-  const SociAiApp({super.key});
+class VibrApp extends StatefulWidget {
+  const VibrApp({super.key});
 
   @override
-  State<SociAiApp> createState() => _SociAiAppState();
+  State<VibrApp> createState() => _VibrAppState();
 }
 
-class _SociAiAppState extends State<SociAiApp> {
-  late final AppController _controller;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = AppController();
-  }
+class _VibrAppState extends State<VibrApp> {
+  late final AppController _controller = AppController();
 
   @override
   void dispose() {
@@ -46,21 +41,21 @@ class _SociAiAppState extends State<SociAiApp> {
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
-      home: _SociAiHome(controller: _controller),
+      home: _VibrHome(controller: _controller),
     );
   }
 }
 
-class _SociAiHome extends StatefulWidget {
-  const _SociAiHome({required this.controller});
+class _VibrHome extends StatefulWidget {
+  const _VibrHome({required this.controller});
 
   final AppController controller;
 
   @override
-  State<_SociAiHome> createState() => _SociAiHomeState();
+  State<_VibrHome> createState() => _VibrHomeState();
 }
 
-class _SociAiHomeState extends State<_SociAiHome> {
+class _VibrHomeState extends State<_VibrHome> {
   int _selectedIndex = 0;
   int _scheduleVersion = 0;
   int _createVersion = 0;
@@ -160,7 +155,7 @@ class _SociAiHomeState extends State<_SociAiHome> {
             initialPost: _editingPost,
             showBottomNavigation: false,
           ),
-          const _InsightsScreen(),
+          const InsightsScreen(),
           ProfileScreen(onBack: () => _onNavigationSelected(0)),
         ],
       ),
@@ -169,37 +164,6 @@ class _SociAiHomeState extends State<_SociAiHome> {
         child: AppBottomNavigation(
           selectedIndex: _selectedIndex,
           onSelected: _onNavigationSelected,
-        ),
-      ),
-    );
-  }
-}
-
-class _InsightsScreen extends StatelessWidget {
-  const _InsightsScreen();
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      body: SafeArea(
-        child: Center(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(Icons.insights_rounded, size: 40, color: AppColors.accent),
-              const SizedBox(height: 12),
-              Text(
-                'Insight',
-                style: Theme.of(context).textTheme.headlineMedium,
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'Analitik akan segera hadir.',
-                style: Theme.of(context).textTheme.bodyMedium,
-              ),
-            ],
-          ),
         ),
       ),
     );

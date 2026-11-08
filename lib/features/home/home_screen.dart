@@ -75,15 +75,39 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       // SafeArea: supaya isi tidak tertutup notch / status bar.
       body: SafeArea(
-        // Align(topCenter): isi menempel di atas. Tanpa ini isi ter-center secara vertikal.
-        child: Align(
-          alignment: Alignment.topCenter,
-          // ConstrainedBox: batasi lebar maksimal 620 supaya tetap rapi di layar lebar / web.
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 620),
-            // SingleChildScrollView: isi bisa di-scroll kalau lebih tinggi dari layar.
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.fromLTRB(24, 20, 24, 24),
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final horizontalPadding = switch (constraints.maxWidth) {
+              >= 1200 => 40.0,
+              >= 600 => 28.0,
+              _ => 20.0,
+            };
+            final metricCards = [
+              const MetricCard(
+                value: '12',
+                label: 'Postingan terjadwal',
+                icon: Icons.calendar_today_outlined,
+              ),
+              const MetricCard(
+                value: '+8.3%',
+                label: 'Tingkat engagement',
+                icon: Icons.calendar_today_outlined,
+                tint: AppColors.teal,
+              ),
+              const MetricCard(
+                value: '24',
+                label: 'Komentar baru',
+                icon: Icons.calendar_today_outlined,
+              ),
+            ];
+
+            return SingleChildScrollView(
+              padding: EdgeInsets.fromLTRB(
+                horizontalPadding,
+                20,
+                horizontalPadding,
+                24,
+              ),
               // Column: menyusun widget dari atas ke bawah.
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -91,33 +115,33 @@ class _HomeScreenState extends State<HomeScreen> {
                   // Sapaan + tanggal + avatar (widget buatan sendiri, ada di bawah file ini).
                   _Header(name: _userName, now: now),
                   const SizedBox(height: 20),
-                  // IntrinsicHeight + Row(stretch): tiga kartu angka dibuat sama tinggi.
-                  const IntrinsicHeight(
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                  if (constraints.maxWidth < 300)
+                    Column(
                       children: [
-                        // MetricCard: kartu angka ringkas (widget buatan sendiri di shared/widgets).
-                        // Lebar dibagi rata oleh Expanded di dalam MetricCard.
-                        MetricCard(
-                          value: '12',
-                          label: 'Postingan terjadwal',
-                          icon: Icons.calendar_today_outlined,
-                        ),
-                        SizedBox(width: 10),
-                        MetricCard(
-                          value: '+8.3%',
-                          label: 'Tingkat engagement',
-                          icon: Icons.calendar_today_outlined,
-                          tint: AppColors.teal,
-                        ),
-                        SizedBox(width: 10),
-                        MetricCard(
-                          value: '24',
-                          label: 'Komentar baru',
-                          icon: Icons.calendar_today_outlined,
-                        ),
+                        for (final card in metricCards) ...[
+                          IntrinsicHeight(
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [card],
+                            ),
+                          ),
+                          if (card != metricCards.last)
+                            const SizedBox(height: 10),
+                        ],
                       ],
-                    ),
+                    )
+                  else
+                    IntrinsicHeight(
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          metricCards[0],
+                          const SizedBox(width: 10),
+                          metricCards[1],
+                          const SizedBox(width: 10),
+                          metricCards[2],
+                        ],
+                      ),
                   ),
                   const SizedBox(height: 26),
                   // SectionHeading: judul bagian + tombol teks 'Lihat semua'.
@@ -174,8 +198,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ],
               ),
-            ),
-          ),
+            );
+          },
         ),
       ),
       // Menu navigasi bawah (NavigationBar). selectedIndex 0 = tab Beranda aktif.

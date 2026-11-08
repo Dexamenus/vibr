@@ -8,12 +8,14 @@ class SectionHeading extends StatelessWidget {
     required this.title,
     this.actionLabel,
     this.onAction,
+    this.trailing,
     this.padding = const EdgeInsets.only(bottom: 12),
   });
 
   final String title;
   final String? actionLabel;
   final VoidCallback? onAction;
+  final Widget? trailing;
   final EdgeInsetsGeometry padding;
 
   @override
@@ -40,6 +42,7 @@ class SectionHeading extends StatelessWidget {
                 style: const TextStyle(color: AppColors.accent),
               ),
             ),
+          ?trailing,
         ],
       ),
     );

@@ -7,7 +7,7 @@ void main() {
   testWidgets('Home screen is shown when the app launches', (
     WidgetTester tester,
   ) async {
-    await tester.pumpWidget(const SociAiApp());
+    await tester.pumpWidget(const VibrApp());
 
     expect(
       tester.widget<MaterialApp>(find.byType(MaterialApp)).locale,
@@ -19,10 +19,31 @@ void main() {
     expect(find.text('12'), findsOneWidget);
   });
 
+  testWidgets('Home screen adapts to narrow and wide layouts', (
+    WidgetTester tester,
+  ) async {
+    tester.view.devicePixelRatio = 1;
+    tester.view.physicalSize = const Size(320, 800);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    addTearDown(tester.view.resetPhysicalSize);
+
+    await tester.pumpWidget(const VibrApp());
+    expect(tester.getSize(find.byType(SingleChildScrollView).first).width, 320);
+    expect(tester.takeException(), isNull);
+
+    tester.view.physicalSize = const Size(1200, 900);
+    await tester.pumpAndSettle();
+    expect(
+      tester.getSize(find.byType(SingleChildScrollView).first).width,
+      1200,
+    );
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('Bottom navigation opens each destination', (
     WidgetTester tester,
   ) async {
-    await tester.pumpWidget(const SociAiApp());
+    await tester.pumpWidget(const VibrApp());
 
     await tester.tap(find.text('Jadwal'));
     await tester.pumpAndSettle();
@@ -32,9 +53,9 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('Jadwal Baru'), findsOneWidget);
 
-    await tester.tap(find.text('Insight'));
+    await tester.tap(find.text('Wawasan'));
     await tester.pumpAndSettle();
-    expect(find.text('Analitik akan segera hadir.'), findsOneWidget);
+    expect(find.text('Kinerja konten'), findsOneWidget);
 
     await tester.tap(find.text('Profil'));
     await tester.pumpAndSettle();
@@ -48,7 +69,7 @@ void main() {
   testWidgets('Month and year can be selected from the calendar header', (
     WidgetTester tester,
   ) async {
-    await tester.pumpWidget(const SociAiApp());
+    await tester.pumpWidget(const VibrApp());
     await tester.tap(find.text('Jadwal'));
     await tester.pumpAndSettle();
 
@@ -78,7 +99,7 @@ void main() {
   testWidgets(
     'Generate caption asks for a prompt and drafts a caption from it',
     (WidgetTester tester) async {
-      await tester.pumpWidget(const SociAiApp());
+      await tester.pumpWidget(const VibrApp());
 
       await tester.tap(find.text('Buat'));
       await tester.pumpAndSettle();
@@ -106,7 +127,7 @@ void main() {
   testWidgets(
     'Create flow schedules a post with a bounded split date and time picker',
     (WidgetTester tester) async {
-      await tester.pumpWidget(const SociAiApp());
+      await tester.pumpWidget(const VibrApp());
 
       await tester.tap(find.text('Buat'));
       await tester.pumpAndSettle();
@@ -181,7 +202,7 @@ void main() {
   testWidgets('Post now hides the arrow, publishes, and opens post detail', (
     WidgetTester tester,
   ) async {
-    await tester.pumpWidget(const SociAiApp());
+    await tester.pumpWidget(const VibrApp());
 
     await tester.tap(find.text('Buat'));
     await tester.pumpAndSettle();
@@ -218,7 +239,7 @@ void main() {
   testWidgets('Schedule card menu can edit and delete a post', (
     WidgetTester tester,
   ) async {
-    await tester.pumpWidget(const SociAiApp());
+    await tester.pumpWidget(const VibrApp());
     await tester.tap(find.text('Jadwal'));
     await tester.pumpAndSettle();
     const postId = 'post-oct-27';
