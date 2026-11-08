@@ -8,12 +8,12 @@ import 'package:vibr/features/comments/comments_screen.dart';
 import 'package:vibr/features/shell/home_shell.dart';
 
 void main() {
-  testWidgets('renders the SociAI sign-in screen', (WidgetTester tester) async {
+  testWidgets('renders the Vibr sign-in screen', (WidgetTester tester) async {
     final controller = AppController();
     addTearDown(controller.dispose);
     await tester.pumpWidget(_app(SignInScreen(controller: controller)));
 
-    expect(find.text('SociAI'), findsOneWidget);
+    expect(find.text('Vibr'), findsOneWidget);
     expect(find.text('Welcome back'), findsOneWidget);
     expect(find.text('Your next great idea is waiting.'), findsOneWidget);
     expect(find.text('Continue with Facebook'), findsOneWidget);
