@@ -1,19 +1,54 @@
 import 'package:flutter/material.dart';
+
 import '../../core/theme/app_theme.dart';
 import '../../shared/widgets/surface_card.dart';
 
 // Import seluruh halaman fitur profil
 import 'edit_profile/edit_profile_screen.dart';
-import 'ai_configuration/ai_configuration_screen.dart';
 import 'connection/connections_screen.dart';
 import 'appearance/appearance_screen.dart';
 import 'notifications/notifications_screen.dart';
 import 'library/library_screen.dart';
 
 class ProfileScreen extends StatelessWidget {
-  const ProfileScreen({super.key, this.onBack});
+  const ProfileScreen({super.key, this.onBack, required this.onSignOut});
 
   final VoidCallback? onBack;
+  final Future<void> Function() onSignOut;
+
+  Future<void> _confirmSignOut(BuildContext context) async {
+    final shouldSignOut = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: AppColors.surface,
+        title: const Text(
+          'Keluar dari akun?',
+          style: TextStyle(color: Colors.white),
+        ),
+        content: const Text(
+          'Kamu perlu masuk kembali untuk menggunakan Vibr.',
+          style: TextStyle(color: AppColors.muted),
+        ),
+        actions: [
+          TextButton(
+            key: const ValueKey('cancel-sign-out'),
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Batal'),
+          ),
+          TextButton(
+            key: const ValueKey('confirm-sign-out'),
+            onPressed: () => Navigator.pop(context, true),
+            style: TextButton.styleFrom(foregroundColor: AppColors.red),
+            child: const Text('Keluar'),
+          ),
+        ],
+      ),
+    );
+
+    if (shouldSignOut == true) {
+      await onSignOut();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -57,7 +92,7 @@ class ProfileScreen extends StatelessWidget {
                     ),
                     child: const Center(
                       child: Text(
-                        'FI', 
+                        'FI',
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: 16,
@@ -72,7 +107,7 @@ class ProfileScreen extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Faizal Isman', 
+                          'Faizal Isman',
                           style: TextStyle(
                             color: Colors.white,
                             fontSize: 18,
@@ -81,7 +116,7 @@ class ProfileScreen extends StatelessWidget {
                         ),
                         SizedBox(height: 4),
                         Text(
-                          'isman.faizal2006@gmail.com', 
+                          'isman.faizal2006@gmail.com',
                           style: TextStyle(
                             color: AppColors.muted,
                             fontSize: 14,
@@ -115,22 +150,9 @@ class ProfileScreen extends StatelessWidget {
 
             // Menu Items
             _buildMenuItem(
-              icon: Icons.smart_toy_outlined,
-              title: 'Konfigurasi AI',
-              value: 'GPT-4o mini /\nFLUX Schnell',
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const AiConfigurationScreen(),
-                  ),
-                );
-              },
-            ),
-            _buildMenuItem(
               icon: Icons.camera_alt_outlined,
               title: 'Koneksi',
-              value: '2 akun demo',
+              value: 'Akun sosial',
               onTap: () {
                 Navigator.push(
                   context,
@@ -167,7 +189,7 @@ class ProfileScreen extends StatelessWidget {
               },
             ),
             _buildMenuItem(
-              icon: Icons.calendar_today_outlined, 
+              icon: Icons.calendar_today_outlined,
               title: 'Pustaka',
               value: 'Buat Gambar,\nHapus BG,\nBuat Canva',
               onTap: () {
@@ -186,14 +208,8 @@ class ProfileScreen extends StatelessWidget {
               width: double.infinity,
               height: 54,
               child: ElevatedButton(
-                onPressed: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Anda telah keluar.'),
-                      backgroundColor: AppColors.red,
-                    ),
-                  );
-                },
+                key: const ValueKey('sign-out-button'),
+                onPressed: () => _confirmSignOut(context),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.red,
                   foregroundColor: Colors.white,
@@ -255,11 +271,7 @@ class ProfileScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 12),
-            const Icon(
-              Icons.chevron_right,
-              color: AppColors.muted,
-              size: 20,
-            ),
+            const Icon(Icons.chevron_right, color: AppColors.muted, size: 20),
           ],
         ),
       ),

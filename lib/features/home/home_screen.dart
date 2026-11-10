@@ -10,6 +10,7 @@ import '../../shared/widgets/top_toast.dart';
 import '../canva/canva_connection.dart';
 import '../canva/canva_flow.dart';
 import '../create/create_with_ai_screen.dart';
+import '../remove_background/remove_background_screen.dart';
 
 // HomeScreen = halaman Beranda. Pakai StatefulWidget karena menyimpan objek yang
 // hidup selama halaman ada (CanvaConnection) dan perlu dibuang di dispose().
@@ -47,6 +48,10 @@ class _HomeScreenState extends State<HomeScreen> {
   void _openAiImage() => Navigator.of(
     context,
   ).push(MaterialPageRoute<void>(builder: (_) => const CreateWithAiScreen()));
+
+  void _openRemoveBackground() => Navigator.of(context).push(
+    MaterialPageRoute<void>(builder: (_) => const RemoveBackgroundScreen()),
+  );
 
   // Menampilkan toast singkat di atas layar untuk fitur yang belum tersedia.
   void _comingSoon() => showTopToast(
@@ -142,7 +147,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           metricCards[2],
                         ],
                       ),
-                  ),
+                    ),
                   const SizedBox(height: 26),
                   // SectionHeading: judul bagian + tombol teks 'Lihat semua'.
                   SectionHeading(
@@ -192,7 +197,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       _ToolButton(
                         icon: const Icon(Icons.layers_clear_outlined, size: 24),
                         label: 'Hapus BG',
-                        onTap: _comingSoon,
+                        onTap: _openRemoveBackground,
                       ),
                     ],
                   ),

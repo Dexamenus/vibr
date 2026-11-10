@@ -4,6 +4,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'core/models/app_models.dart';
 import 'core/state/app_controller.dart';
 import 'core/theme/app_theme.dart';
+import 'features/auth/auth_flow.dart';
 import 'features/create/create_screen.dart';
 import 'features/home/home_screen.dart';
 import 'features/insights/insights_screen.dart';
@@ -41,15 +42,20 @@ class _VibrAppState extends State<VibrApp> {
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
-      home: _VibrHome(controller: _controller),
+      home: AuthFlow(
+        controller: _controller,
+        appBuilder: (onSignOut) =>
+            _VibrHome(controller: _controller, onSignOut: onSignOut),
+      ),
     );
   }
 }
 
 class _VibrHome extends StatefulWidget {
-  const _VibrHome({required this.controller});
+  const _VibrHome({required this.controller, required this.onSignOut});
 
   final AppController controller;
+  final Future<void> Function() onSignOut;
 
   @override
   State<_VibrHome> createState() => _VibrHomeState();
@@ -156,7 +162,10 @@ class _VibrHomeState extends State<_VibrHome> {
             showBottomNavigation: false,
           ),
           const InsightsScreen(),
-          ProfileScreen(onBack: () => _onNavigationSelected(0)),
+          ProfileScreen(
+            onBack: () => _onNavigationSelected(0),
+            onSignOut: widget.onSignOut,
+          ),
         ],
       ),
       bottomNavigationBar: SafeArea(

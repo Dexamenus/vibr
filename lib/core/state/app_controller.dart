@@ -83,6 +83,8 @@ class AppController extends ChangeNotifier {
   late List<SocialPost> _posts;
   late List<SocialComment> _comments;
   String brandName = 'Zahira Studio';
+  String brandIndustry = 'Belum dipilih';
+  Uint8List? brandImageBytes;
 
   List<SocialPost> get posts {
     final result = [..._posts]
@@ -112,6 +114,17 @@ class AppController extends ChangeNotifier {
 
   void updateBrandName(String value) {
     brandName = value.trim().isEmpty ? 'Merek Anda' : value.trim();
+    notifyListeners();
+  }
+
+  void updateBrandProfile({
+    required String name,
+    required String industry,
+    Uint8List? imageBytes,
+  }) {
+    brandName = name.trim();
+    brandIndustry = industry;
+    brandImageBytes = imageBytes;
     notifyListeners();
   }
 
