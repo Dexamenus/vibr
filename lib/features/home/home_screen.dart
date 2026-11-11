@@ -10,11 +10,21 @@ import '../../shared/widgets/top_toast.dart';
 import '../canva/canva_connection.dart';
 import '../canva/canva_flow.dart';
 import '../create/create_with_ai_screen.dart';
+import '../remove_background/remove_background_screen.dart';
 
 // HomeScreen = halaman Beranda. Pakai StatefulWidget karena menyimpan objek yang
 // hidup selama halaman ada (CanvaConnection) dan perlu dibuang di dispose().
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  const HomeScreen({
+    super.key,
+    this.onNavigationSelected,
+    this.onOpenSchedule,
+    this.showBottomNavigation = true,
+  });
+
+  final ValueChanged<int>? onNavigationSelected;
+  final VoidCallback? onOpenSchedule;
+  final bool showBottomNavigation;
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -39,6 +49,10 @@ class _HomeScreenState extends State<HomeScreen> {
     context,
   ).push(MaterialPageRoute<void>(builder: (_) => const CreateWithAiScreen()));
 
+  void _openRemoveBackground() => Navigator.of(context).push(
+    MaterialPageRoute<void>(builder: (_) => const RemoveBackgroundScreen()),
+  );
+
   // Menampilkan toast singkat di atas layar untuk fitur yang belum tersedia.
   void _comingSoon() => showTopToast(
     context,
@@ -50,6 +64,10 @@ class _HomeScreenState extends State<HomeScreen> {
   // Dipanggil saat item navigasi bawah ditekan. index 0 = Beranda (halaman ini).
   void _onNavSelected(int index) {
     if (index == 0) return;
+    if (index == 1 && widget.onOpenSchedule != null) {
+      widget.onOpenSchedule!();
+      return;
+    }
     // Jadwal, Buat (nanti buat jadwal), Insight, dan Profil belum tersedia.
     _comingSoon();
   }
@@ -62,15 +80,39 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       // SafeArea: supaya isi tidak tertutup notch / status bar.
       body: SafeArea(
-        // Align(topCenter): isi menempel di atas. Tanpa ini isi ter-center secara vertikal.
-        child: Align(
-          alignment: Alignment.topCenter,
-          // ConstrainedBox: batasi lebar maksimal 620 supaya tetap rapi di layar lebar / web.
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 620),
-            // SingleChildScrollView: isi bisa di-scroll kalau lebih tinggi dari layar.
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.fromLTRB(24, 20, 24, 24),
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final horizontalPadding = switch (constraints.maxWidth) {
+              >= 1200 => 40.0,
+              >= 600 => 28.0,
+              _ => 20.0,
+            };
+            final metricCards = [
+              const MetricCard(
+                value: '12',
+                label: 'Postingan terjadwal',
+                icon: Icons.calendar_today_outlined,
+              ),
+              const MetricCard(
+                value: '+8.3%',
+                label: 'Tingkat engagement',
+                icon: Icons.calendar_today_outlined,
+                tint: AppColors.teal,
+              ),
+              const MetricCard(
+                value: '24',
+                label: 'Komentar baru',
+                icon: Icons.calendar_today_outlined,
+              ),
+            ];
+
+            return SingleChildScrollView(
+              padding: EdgeInsets.fromLTRB(
+                horizontalPadding,
+                20,
+                horizontalPadding,
+                24,
+              ),
               // Column: menyusun widget dari atas ke bawah.
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -78,40 +120,40 @@ class _HomeScreenState extends State<HomeScreen> {
                   // Sapaan + tanggal + avatar (widget buatan sendiri, ada di bawah file ini).
                   _Header(name: _userName, now: now),
                   const SizedBox(height: 20),
-                  // IntrinsicHeight + Row(stretch): tiga kartu angka dibuat sama tinggi.
-                  const IntrinsicHeight(
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                  if (constraints.maxWidth < 300)
+                    Column(
                       children: [
-                        // MetricCard: kartu angka ringkas (widget buatan sendiri di shared/widgets).
-                        // Lebar dibagi rata oleh Expanded di dalam MetricCard.
-                        MetricCard(
-                          value: '12',
-                          label: 'Postingan terjadwal',
-                          icon: Icons.calendar_today_outlined,
-                        ),
-                        SizedBox(width: 10),
-                        MetricCard(
-                          value: '+8.3%',
-                          label: 'Tingkat engagement',
-                          icon: Icons.calendar_today_outlined,
-                          tint: AppColors.teal,
-                        ),
-                        SizedBox(width: 10),
-                        MetricCard(
-                          value: '24',
-                          label: 'Komentar baru',
-                          icon: Icons.calendar_today_outlined,
-                        ),
+                        for (final card in metricCards) ...[
+                          IntrinsicHeight(
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [card],
+                            ),
+                          ),
+                          if (card != metricCards.last)
+                            const SizedBox(height: 10),
+                        ],
                       ],
+                    )
+                  else
+                    IntrinsicHeight(
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          metricCards[0],
+                          const SizedBox(width: 10),
+                          metricCards[1],
+                          const SizedBox(width: 10),
+                          metricCards[2],
+                        ],
+                      ),
                     ),
-                  ),
                   const SizedBox(height: 26),
                   // SectionHeading: judul bagian + tombol teks 'Lihat semua'.
                   SectionHeading(
                     title: 'Jadwal Hari Ini',
                     actionLabel: 'Lihat semua',
-                    onAction: _comingSoon,
+                    onAction: widget.onOpenSchedule ?? _comingSoon,
                   ),
                   // Kartu jadwal (data dummy). Dibuat sebagai widget terpisah supaya kode tidak diulang.
                   const _ScheduleCard(
@@ -155,21 +197,23 @@ class _HomeScreenState extends State<HomeScreen> {
                       _ToolButton(
                         icon: const Icon(Icons.layers_clear_outlined, size: 24),
                         label: 'Hapus BG',
-                        onTap: _comingSoon,
+                        onTap: _openRemoveBackground,
                       ),
                     ],
                   ),
                 ],
               ),
-            ),
-          ),
+            );
+          },
         ),
       ),
       // Menu navigasi bawah (NavigationBar). selectedIndex 0 = tab Beranda aktif.
-      bottomNavigationBar: AppBottomNavigation(
-        selectedIndex: 0,
-        onSelected: _onNavSelected,
-      ),
+      bottomNavigationBar: widget.showBottomNavigation
+          ? AppBottomNavigation(
+              selectedIndex: 0,
+              onSelected: widget.onNavigationSelected ?? _onNavSelected,
+            )
+          : null,
     );
   }
 }

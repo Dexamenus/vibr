@@ -10,6 +10,7 @@ OverlayEntry? _currentToast;
 void showTopToast(
   BuildContext context, {
   required String message,
+  String? title,
   IconData icon = Icons.check_circle_outline_rounded,
   Color iconColor = AppColors.teal,
   Duration duration = const Duration(seconds: 3),
@@ -21,6 +22,7 @@ void showTopToast(
   entry = OverlayEntry(
     builder: (_) => _TopToast(
       message: message,
+      title: title ?? _titleForColor(iconColor),
       icon: icon,
       iconColor: iconColor,
       duration: duration,
@@ -34,9 +36,17 @@ void showTopToast(
   overlay.insert(entry);
 }
 
+String _titleForColor(Color color) {
+  if (color == AppColors.teal) return 'Berhasil';
+  if (color == AppColors.red) return 'Terjadi kesalahan';
+  if (color == AppColors.amber) return 'Perlu perhatian';
+  return 'Informasi';
+}
+
 class _TopToast extends StatefulWidget {
   const _TopToast({
     required this.message,
+    required this.title,
     required this.icon,
     required this.iconColor,
     required this.duration,
@@ -44,6 +54,7 @@ class _TopToast extends StatefulWidget {
   });
 
   final String message;
+  final String title;
   final IconData icon;
   final Color iconColor;
   final Duration duration;
@@ -104,36 +115,75 @@ class _TopToastState extends State<_TopToast>
                 begin: const Offset(0, -0.6),
                 end: Offset.zero,
               ).animate(_curve),
-              child: GestureDetector(
-                onTap: _dismiss,
-                child: Material(
-                  color: AppColors.surfaceRaised,
-                  elevation: 8,
-                  shadowColor: Colors.black,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    side: const BorderSide(color: AppColors.border),
+              child: Material(
+                color: AppColors.surfaceRaised,
+                elevation: 8,
+                shadowColor: Colors.black,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  side: const BorderSide(color: AppColors.border),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 14,
                   ),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 14,
-                    ),
-                    child: Row(
-                      children: [
-                        Icon(widget.icon, color: widget.iconColor, size: 22),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Text(
-                            widget.message,
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 14,
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 28,
+                        height: 28,
+                        decoration: BoxDecoration(
+                          color: widget.iconColor.withValues(alpha: 0.1),
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(
+                          widget.icon,
+                          color: widget.iconColor,
+                          size: 17,
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              widget.title,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
+                            const SizedBox(height: 3),
+                            Text(
+                              widget.message,
+                              style: const TextStyle(
+                                color: AppColors.muted,
+                                fontSize: 11,
+                                height: 1.25,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      InkWell(
+                        key: const ValueKey('dismiss-feedback-toast'),
+                        borderRadius: BorderRadius.circular(20),
+                        onTap: _dismiss,
+                        child: const Padding(
+                          padding: EdgeInsets.all(4),
+                          child: Icon(
+                            Icons.close_rounded,
+                            color: AppColors.muted,
+                            size: 15,
                           ),
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
               ),

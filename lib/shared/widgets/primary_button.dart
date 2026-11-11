@@ -10,6 +10,7 @@ class PrimaryButton extends StatelessWidget {
     this.icon,
     this.isLoading = false,
     this.expand = true,
+    this.showIcon = true,
   });
 
   final String label;
@@ -17,32 +18,43 @@ class PrimaryButton extends StatelessWidget {
   final IconData? icon;
   final bool isLoading;
   final bool expand;
+  final bool showIcon;
 
   @override
   Widget build(BuildContext context) {
+    final style = FilledButton.styleFrom(
+      backgroundColor: AppColors.accent,
+      foregroundColor: Colors.white,
+      disabledBackgroundColor: AppColors.accent.withValues(alpha: 0.5),
+      textStyle: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      padding: const EdgeInsets.symmetric(horizontal: 18),
+      elevation: 0,
+    );
     final child = SizedBox(
       height: 54,
-      child: FilledButton.icon(
-        onPressed: onPressed,
-        icon: isLoading
-            ? const SizedBox.square(
-                dimension: 18,
-                child: CircularProgressIndicator(strokeWidth: 2),
-              )
-            : Icon(icon ?? Icons.arrow_forward_rounded, size: 19),
-        label: Text(label),
-        style: FilledButton.styleFrom(
-          backgroundColor: AppColors.accent,
-          foregroundColor: Colors.white,
-          disabledBackgroundColor: AppColors.accent.withValues(alpha: 0.5),
-          textStyle: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-          padding: const EdgeInsets.symmetric(horizontal: 18),
-          elevation: 0,
-        ),
-      ),
+      child: showIcon
+          ? FilledButton.icon(
+              onPressed: onPressed,
+              icon: isLoading
+                  ? const SizedBox.square(
+                      dimension: 18,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : Icon(icon ?? Icons.arrow_forward_rounded, size: 19),
+              label: Text(label),
+              style: style,
+            )
+          : FilledButton(
+              onPressed: onPressed,
+              style: style,
+              child: isLoading
+                  ? const SizedBox.square(
+                      dimension: 18,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : Text(label),
+            ),
     );
     return expand ? SizedBox(width: double.infinity, child: child) : child;
   }

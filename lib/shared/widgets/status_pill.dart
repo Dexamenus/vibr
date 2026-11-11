@@ -1,16 +1,26 @@
 import 'package:flutter/material.dart';
 
 class StatusPill extends StatelessWidget {
-  const StatusPill({super.key, required this.label, required this.color});
+  const StatusPill({
+    super.key,
+    required this.label,
+    this.color,
+    this.backgroundColor,
+  });
 
   final String label;
-  final Color color;
+  final Color? color;
+  final Color? backgroundColor;
 
   @override
   Widget build(BuildContext context) {
+    final resolvedColor = color ?? Theme.of(context).colorScheme.primary;
+    final resolvedBackgroundColor =
+        backgroundColor ?? resolvedColor.withValues(alpha: 0.12);
+
     return DecoratedBox(
       decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.12),
+        color: resolvedBackgroundColor,
         borderRadius: BorderRadius.circular(30),
       ),
       child: Padding(
@@ -18,7 +28,7 @@ class StatusPill extends StatelessWidget {
         child: Text(
           label,
           style: TextStyle(
-            color: color,
+            color: resolvedColor,
             fontSize: 11,
             fontWeight: FontWeight.w600,
           ),

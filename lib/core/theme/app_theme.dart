@@ -37,6 +37,14 @@ abstract final class AppTheme {
         surfaceTintColor: Colors.transparent,
         margin: EdgeInsets.zero,
       ),
+      dialogTheme: const DialogThemeData(
+        backgroundColor: AppColors.surface,
+        surfaceTintColor: Colors.transparent,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(22)),
+          side: BorderSide(color: AppColors.border),
+        ),
+      ),
       navigationBarTheme: NavigationBarThemeData(
         backgroundColor: AppColors.surface,
         surfaceTintColor: Colors.transparent,
@@ -102,6 +110,12 @@ abstract final class AppTheme {
       snackBarTheme: const SnackBarThemeData(
         behavior: SnackBarBehavior.floating,
         backgroundColor: AppColors.surfaceRaised,
+        contentTextStyle: TextStyle(color: Colors.white, fontSize: 13),
+        insetPadding: EdgeInsets.fromLTRB(16, 0, 16, 16),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(14)),
+          side: BorderSide(color: AppColors.border),
+        ),
       ),
       popupMenuTheme: const PopupMenuThemeData(
         color: AppColors.surfaceRaised,

@@ -40,7 +40,7 @@ class AppBottomNavigation extends StatelessWidget {
         NavigationDestination(
           icon: Icon(Icons.insights_outlined),
           selectedIcon: Icon(Icons.insights_rounded),
-          label: 'Insight',
+          label: 'Wawasan',
         ),
         NavigationDestination(
           icon: Icon(Icons.person_outline_rounded),
